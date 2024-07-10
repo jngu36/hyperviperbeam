@@ -1,12 +1,11 @@
 {
-  "Author": "your name here",
-  "Name": "Sample Plugin",
-  "Punchline": "A short one-liner that shows up in /xlplugins.",
+  "Author": "Shin Senpai",
+  "Name": "Viper Bar",
+  "Punchline": "Le hiss, le hissss",
   "Description": "A description that shows up in /xlplugins. List any major slash-command(s).",
   "ApplicableVersion": "any",
   "Tags": [
-    "sample",
+    "Viper",
     "plugin",
-    "goats"
   ]
 }
