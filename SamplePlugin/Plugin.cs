@@ -1,12 +1,12 @@
-﻿using Dalamud.Game.Command;
+using Dalamud.Game.Command;
 using Dalamud.IoC;
 using Dalamud.Plugin;
 using System.IO;
 using Dalamud.Interface.Windowing;
 using Dalamud.Plugin.Services;
-using SamplePlugin.Windows;
+using ViperBar.Windows;
 
-namespace SamplePlugin;
+namespace ViperBar;
 
 public sealed class Plugin : IDalamudPlugin
 {
@@ -14,26 +14,31 @@ public sealed class Plugin : IDalamudPlugin
     [PluginService] internal static ITextureProvider TextureProvider { get; private set; } = null!;
     [PluginService] internal static ICommandManager CommandManager { get; private set; } = null!;
 
-    private const string CommandName = "/pmycommand";
+    private const string CommandName = "/vb";
 
     public Configuration Configuration { get; init; }
 
-    public readonly WindowSystem WindowSystem = new("SamplePlugin");
+    public readonly WindowSystem WindowSystem = new("ViperBar");
     private ConfigWindow ConfigWindow { get; init; }
-    private MainWindow MainWindow { get; init; }
+    private ViperConfig ViperConfigWindow { get; init; }
+    private IClientState clientState { get; init; } 
+    private IPluginLog log { get; init; }
 
-    public Plugin()
+    public Plugin(IClientState cs, IPluginLog pl)
     {
         Configuration = PluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
+
+        clientState = cs;
+        log = pl;
 
         // you might normally want to embed resources and load them from the manifest stream
         var goatImagePath = Path.Combine(PluginInterface.AssemblyLocation.Directory?.FullName!, "goat.png");
 
         ConfigWindow = new ConfigWindow(this);
-        MainWindow = new MainWindow(this, goatImagePath);
+        ViperConfigWindow = new ViperConfig(this, clientState, log);
 
         WindowSystem.AddWindow(ConfigWindow);
-        WindowSystem.AddWindow(MainWindow);
+        WindowSystem.AddWindow(ViperConfigWindow);
 
         CommandManager.AddHandler(CommandName, new CommandInfo(OnCommand)
         {
@@ -55,7 +60,7 @@ public sealed class Plugin : IDalamudPlugin
         WindowSystem.RemoveAllWindows();
 
         ConfigWindow.Dispose();
-        MainWindow.Dispose();
+        ViperConfigWindow.Dispose();
 
         CommandManager.RemoveHandler(CommandName);
     }
@@ -69,5 +74,5 @@ public sealed class Plugin : IDalamudPlugin
     private void DrawUI() => WindowSystem.Draw();
 
     public void ToggleConfigUI() => ConfigWindow.Toggle();
-    public void ToggleMainUI() => MainWindow.Toggle();
+    public void ToggleMainUI() => ViperConfigWindow.Toggle();
 }
